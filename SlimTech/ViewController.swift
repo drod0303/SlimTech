@@ -34,11 +34,10 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
     
     //TEST DATA
     
-    //for background testing
     @IBOutlet weak var counterLabel: UILabel!
     var backgroundTask: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
+    //for output testing purposes
     var countNum = 1
-    //end testing
     
     //var yValues = [0.5,1.5,3.5,4.0,4.1,7.7,9.9,10,11,11,11,11,11,11,11,12.5,13,13.2,13.3,15,15.1,15.1,15.1,17.9]
     //var xValues = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]
@@ -52,10 +51,8 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
         switchButton.isEnabled = false
         
 
-        //for background testing
-        //this function monitor if the app moved to the background state
+        //initiate obersver::  **this function monitor if the app moved to the background state
         NotificationCenter.default.addObserver(self, selector: #selector(detectBackground), name: Notification.Name.UIApplicationDidEnterBackground, object: nil)
-        //end testing
         //bottom view of application setup
         //sets label variables to default values
         batteryUse.isHidden = true
@@ -391,21 +388,21 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
     }*/
     
     
-    //for background testing
+    ////////////////////// Background functions ////////////////////////// 
     
+    //remove observer
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
     
-    func registerBackgroundTask() {
+    func startBackgroundTask() {
         //.beginBackgroundTask start the long running task
         backgroundTask = UIApplication.shared.beginBackgroundTask { [weak self] in
             self?.endBackgroundTask()
         }
         assert(backgroundTask != UIBackgroundTaskInvalid)
     }
-    
-    //when start button is no longer highlighted
+   
     func endBackgroundTask() {
         print("Background task ended.")
         //must call .endBackgroundTask or else app will be terminated
@@ -413,16 +410,14 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
         backgroundTask = UIBackgroundTaskInvalid
     }
     
-   
-    
     //count add function to output to the Counter label
-    func addOne() {
+    func getData() {
         
+        //countNUm, total, results are for testing purposes
         var total = countNum
         countNum += 1
-      
         let results = "\(total)"
-        
+       
         //showing results in the consel of what state the app is in
         switch UIApplication.shared.applicationState {
         case .active:
@@ -440,18 +435,14 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
     //when app enter the background state
     func detectBackground() {
         print("App is in background")
-        registerBackgroundTask()
+        startBackgroundTask()
         //Timer.scheduledTimer repeat a function at a certain interval for every 1 second
        Timer.scheduledTimer(timeInterval: 1, target: self,
-                                           selector: #selector(addOne), userInfo: nil, repeats: true)
+                                           selector: #selector(getData), userInfo: nil, repeats: true)
         
     }
-    //end testing
     
 
-    
-    
-    
     //////////////*****   CORE DATA IMPLEMENTATION     *****///////////////////
     
     
