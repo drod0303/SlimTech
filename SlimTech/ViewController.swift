@@ -40,8 +40,7 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
     var countNum = 1
     //end testing
     
-    //var screenTimeValues = [0.5,1.5,3.5,4.0,4.1,7.7,9.9,10,11,11,11,11,11,11,11,12.5,13,13.2,13.3,15,15.1,15.1,15.1,17.9]
-    //var timeOfDay = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]
+    //test graph values
     var screenTimeValues = [1.2,2.4,3.2,7.2,9.6,9.5,10.3,18.2,18.3,18.5,18.6,18.7,18.9,18.9,19.0,19.1,19.5,20.6,21.0,22.2,22.3,23.0,23.9,23.9]
     var timeOfDay = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]
     var battery = [99,98,97,96,95,94,93,92,91,90,89,88,87,86,85,84,83,82,81,80,79,78,77,76]
@@ -88,17 +87,11 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
         lineChart.setState(.collapsed, animated: false)
         
         //mathematical work around for the y and x axis labels
-        //TODO: fix resizing issue
         var xString = " "
         var yString = ""
         var step = 3
         var i = 0
         
-        /*while(i<8){
-            xString += "    \(step)    "
-            step = step+3
-            i = i+1
-        }*/
         xString = "      3       6       9      12       3      6       9      12"
         
         xLabel.text = xString
@@ -139,12 +132,9 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
         let header = UILabel(frame: CGRect(x: 0, y: 0, width: barChart.frame.width, height: 25))
         header.textColor = UIColor.black
         header.font = UIFont.systemFont(ofSize: 24)
-        //header.text = "Phone Usage"
         informationLabel.textColor = UIColor.white
         header.textAlignment = NSTextAlignment.center
         
-        
-        //barChart.footerView = footer
         barChart.headerView = header
        
 
@@ -154,6 +144,7 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
     
     @IBAction func switchButtonPressed(_ sender: Any) {
         //allows for the switching between views of line graph and bar graph
+        //also updates corresponding labels for each view when it appears
         
         if(barChart.isHidden == true){
             
@@ -174,6 +165,8 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
         }
     }
     
+    //Depedning on switch button implemented this function will
+    //also switch between the two graph views
     @IBAction func segmentButtonPressed(_ sender: Any) {
         if(barChart.isHidden == true){
             
@@ -196,10 +189,9 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
     }
   
     
-    
+    //reloads data of the graph every time a switch between the graphs is made
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        //reloads data of the graph every time a switch between the graphs is made
         barChart.reloadData()
         lineChart.reloadData()
         
@@ -207,20 +199,21 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
     }
     
     
+    //gets rid of the graph view with an animation every time new view is presented
     override func viewDidDisappear(_ animated: Bool) {
-        //gets rid of the graph view with an animation every time new view is presented
+        
         super.viewDidDisappear(animated)
         hideChart()
         
     }
-
+    //necessary function calls for the JBChart Library graphs to work properly
     func hideChart(){
         barChart.setState(.collapsed, animated: true)
         lineChart.setState(.collapsed, animated: true)
         
     }
     
-    
+    //necessary function calls for the JBChart Library graphs to work properly
     func showChart(){
         barChart.setState(.expanded, animated: true)
         lineChart.setState(.expanded, animated: true)
@@ -229,28 +222,31 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
     
     //MARK: JBBarChartView
     
+    //returns the number of bars necessary to represent the data given to the chart
     func numberOfBars(in barChartView: JBBarChartView!) -> UInt {
         
         return UInt(screenTimeValues.count)
     }
     
+    //returns the value of the maximum height needed to represent the data given to the chart
     func barChartView(_ barChartView: JBBarChartView!, heightForBarViewAt index: UInt) -> CGFloat {
         //returning the height for each bar on the graph
         return CGFloat(screenTimeValues[Int(index)])
         
     }
     
+    //switches the color between each graph
     func barChartView(_ barChartView: JBBarChartView!, colorForBarViewAt index: UInt) -> UIColor! {
-        //switches the color between each graph
+        
         return (index % 2 == 0) ? UIColor.darkGray : UIColor.white
         
         
     }
     
-    
+    //provides animation for the clicking mechanism on the graph
+    //displays the data to the user for that time clicked
     func barChartView(_ barChartView: JBBarChartView!, didSelectBarAt index: UInt, touch touchPoint: CGPoint) {
-        //provides animation for the clicking mechanism on the graph
-        //displays the data to the user for that time clicked
+      
         var data = screenTimeValues[Int(index)]
         var key = timeOfDay[Int(index)]
         
@@ -270,17 +266,21 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
         batteryUseRight.text = "\(battery[Int(index)])"
         batteryUse.isHidden = false
         screenTime.isHidden = false
-        mainApplication.isHidden = false
         
     }
     
+    
+    //this function allows for code action upon user diselection of an item
     func didDeselect(_ barChartView: JBBarChartView!) {
-        //informationLabel.text = ""
+    
     }
     
+    //if a bar is selected by the user then a black highlight will surround it
     func barSelectionColor(for barChartView: JBBarChartView!) -> UIColor! {
         return UIColor.black
     }
+    
+    //pads the amount of space between each value on the chart
     func barPadding(for barChartView: JBBarChartView!) -> CGFloat {
         return CGFloat(2.0)
     }
@@ -288,10 +288,13 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
     
     //MARK: JBLineChartView
     
+    //can have up to multiple lines in line chart view
+    //however for our finished project we shall only have one depicting the data
     func numberOfLines(in lineChartView: JBLineChartView!) -> UInt {
         return 1
     }
     
+    //returns value of highest value given to line chart
     func lineChartView(_ lineChartView: JBLineChartView!, numberOfVerticalValuesAtLineIndex lineIndex: UInt) -> UInt {
         if (lineIndex == 0){
             return UInt(screenTimeValues.count)
@@ -300,6 +303,7 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
         return 0
     }
     
+    //returns value for the x axis at which the user clicks
     func lineChartView(_ lineChartView: JBLineChartView!, verticalValueForHorizontalIndex horizontalIndex: UInt, atLineIndex lineIndex: UInt) -> CGFloat {
         if(lineIndex == 0) {
             return CGFloat(screenTimeValues[Int(horizontalIndex)])
@@ -308,6 +312,8 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
         return 0
     }
     
+    //returns the color for the line
+    //can support multiple line coloring
     func lineChartView(_ lineChartView: JBLineChartView!, colorForLineAtLineIndex lineIndex: UInt) -> UIColor! {
         if (lineIndex == 0){
             return UIColor.white
@@ -316,18 +322,22 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
         return UIColor.purple
     }
     
+    // allows values to be represented by a dot instead of just a line alone
     func lineChartView(_ lineChartView: JBLineChartView!, showsDotsForLineAtLineIndex lineIndex: UInt) -> Bool {
         return true
     }
     
+    //returns the color for the highlight at the selected index
     func lineChartView(_ lineChartView: JBLineChartView!, selectionColorForDotAtHorizontalIndex horizontalIndex: UInt, atLineIndex lineIndex: UInt) -> UIColor! {
         return UIColor.black
     }
     
+    //makes the line smoother as opposed to a rough and jagged connection of dots
     func lineChartView(_ lineChartView: JBLineChartView!, smoothLineAtLineIndex lineIndex: UInt) -> Bool {
         return true
     }
     
+    //allows for update of the lower view upon selection in the line chart
     func lineChartView(_ lineChartView: JBLineChartView!, didSelectLineAt lineIndex: UInt, horizontalIndex: UInt) {
         if (lineIndex == 0){
             var data = screenTimeValues[Int(horizontalIndex)]
@@ -349,14 +359,16 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
         }
         batteryUse.isHidden = false
         screenTime.isHidden = false
-        mainApplication.isHidden = false
+       // mainApplication.isHidden = false
 
     }
     
+    //if the user deselects the chart then you could update certain values here
     func didDeselectLine(in lineChartView: JBLineChartView!) {
         //informationLabel.text = ""
     }
     
+    //returns the size for the dots at each value on the line graph
     func lineChartView(_ lineChartView: JBLineChartView!, dotRadiusForDotAtHorizontalIndex horizontalIndex: UInt, atLineIndex lineIndex: UInt) -> CGFloat {
         return CGFloat(8)
     }
@@ -380,14 +392,6 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
         
         return time
     }
-   /* func lineChartView(_ lineChartView: JBLineChartView!, fillColorForLineAtLineIndex lineIndex: UInt) -> UIColor! {
-        if (lineIndex == 0) {
-            return UIColor.darkGray
-        }
-        else {
-            return UIColor.white
-        }
-    }*/
     
     
     //for background testing

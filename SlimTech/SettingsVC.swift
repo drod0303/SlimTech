@@ -40,21 +40,13 @@ class SettingsVC: UIViewController {
 
     
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
     
     //this function allows views to be erased rather than simply stacked upon
     @IBAction func backButtonPressed(_ sender: Any) {
         dismiss(animated: true, completion: nil)
     }
 
+    //button notifier that allows the time picker to be presented based upon the boolean value of a switch
     @IBAction func timeAlertSwitchPressed(_ sender: Any) {
         if(timeAlertSwitch.isOn){
             timeAlertPicker.isHidden = false
@@ -112,7 +104,8 @@ class SettingsVC: UIViewController {
         
     }
     
-    
+    //allows for the time selected by the user to be saved into core data
+    //still needs updating because there is a certain bug occuring when the time is before the current time
     @IBAction func saveButtonPressed(_ sender: Any) {
         saveButton.isHidden = true
         if(timeAlertPicker.isHidden == false){
