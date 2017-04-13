@@ -263,7 +263,7 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
             informationLabel.text = "Usage at \(key) PM"
         }
         screenTimeRight.text = time
-        batteryUseRight.text = "\(battery[Int(index)])"
+        batteryUseRight.text = "\(battery[Int(index)])%"
         batteryUse.isHidden = false
         screenTime.isHidden = false
         
@@ -348,7 +348,7 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
             }
             var time = calculateTime(data: data)
             screenTimeRight.text = time
-            batteryUseRight.text = "\(battery[Int(horizontalIndex)])"
+            batteryUseRight.text = "\(battery[Int(horizontalIndex)])%"
 
 
             if(arrayKey < 11 || arrayKey == 23){
