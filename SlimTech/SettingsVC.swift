@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import UserNotifications
 
 class SettingsVC: UIViewController {
     
@@ -22,8 +23,16 @@ class SettingsVC: UIViewController {
     
     @IBOutlet weak var percentUsageTextEntry: UITextField!
     
+    
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        //configure user notification center
+       UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
+        
+        
         view.backgroundColor = UIColor.black
         timeAlertPicker.setValue(UIColor.white, forKeyPath: "textColor")
         timeAlertPicker.timeZone = NSTimeZone.local
@@ -33,6 +42,8 @@ class SettingsVC: UIViewController {
         timeAlertPicker.isHidden = true
         
         percentUsageTextEntry.isHidden = true
+        
+        
         
         
         
@@ -107,10 +118,12 @@ class SettingsVC: UIViewController {
     //allows for the time selected by the user to be saved into core data
     //still needs updating because there is a certain bug occuring when the time is before the current time
     @IBAction func saveButtonPressed(_ sender: Any) {
+       
         saveButton.isHidden = true
         if(timeAlertPicker.isHidden == false){
             var hour = timeAlertPicker.value(forKeyPath: "hour") as? Int
             let minute = timeAlertPicker.value(forKeyPath: "minute") as? Int
+            setUpLocalNotification(hour: hour!, minute: minute!)
             var minuteString = ""
             var hourString = ""
             
@@ -143,8 +156,87 @@ class SettingsVC: UIViewController {
         }
     }
     
+     func setUpLocalNotification(hour: Int, minute: Int) {
+        
+        // Request Notification Settings
+        UNUserNotificationCenter.current().getNotificationSettings { (notificationSettings) in
+            switch notificationSettings.authorizationStatus {
+            case .notDetermined:
+                self.requestAuthorization(completionHandler: { (success) in
+                    guard success else { return }
+                    
+                    // Schedule Local Notification
+                    self.scheduleLocalNotification()
+                })
+            case .authorized:
+                // Schedule Local Notification
+                self.scheduleLocalNotification()
+            case .denied:
+                print("Application Not Allowed to Display Notifications")
+            }
+        }
+        
+    }
+    
+    
+    private func requestAuthorization(completionHandler: @escaping (_ success: Bool) -> ()) {
+        // Request Authorization
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { (success, error) in
+            if let error = error {
+                print("Request Authorization Failed (\(error), \(error.localizedDescription))")
+            }
+            
+            completionHandler(success)
+        }
+    }
+    
+    private func scheduleLocalNotification() {
+        
+        var hour = Calendar.current.component(.hour, from: Date())
+        if(hour==0){
+            hour = 24
+        }else if (hour == 24){
+            hour = 1
+        }
+        
+        // Create Notification Content
+        let notificationContent = UNMutableNotificationContent()
+        
+        // Configure Notification Content
+        notificationContent.title = "Slimetch"
+        notificationContent.subtitle = "Local Notification"
+        notificationContent.body = "Total screen time used so far: \(screenTimeValues[hour-1]) hours"
+        
+        // Add Trigger
+        let notificationTrigger = UNTimeIntervalNotificationTrigger(timeInterval: 10.0, repeats: false)
+
+        
+        // Create Notification Request
+        let notificationRequest = UNNotificationRequest(identifier: "cocoacasts_local_notification", content: notificationContent, trigger: notificationTrigger)
+        
+        // Add Request to User Notification Center
+        UNUserNotificationCenter.current().add(notificationRequest) { (error) in
+            if let error = error {
+                print("Unable to Add Notification Request (\(error), \(error.localizedDescription))")
+            }
+        }
+    }
     
     
     
+}
+
+
+
+extension ViewController: UNUserNotificationCenterDelegate {
+    
+    
+    
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([.alert, .badge, .sound])
+        
+        
+    }
     
 }

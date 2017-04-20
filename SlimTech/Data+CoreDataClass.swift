@@ -10,6 +10,10 @@
 import Foundation
 import CoreData
 
+var screenTimeValues = [0.0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+var timeOfDay = [1,2,3,4,5,6,7,8,9,10,11,12,1,2,3,4,5,6,7,8,9,10,11,12]
+var battery = [0.0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
 //@objc(Data)
 public class Data: NSManagedObject {
     

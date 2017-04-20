@@ -41,9 +41,7 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
     //end testing
     
     //test graph values
-    var screenTimeValues = [0.0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    var timeOfDay = [1,2,3,4,5,6,7,8,9,10,11,12,1,2,3,4,5,6,7,8,9,10,11,12]
-    var battery = [0.0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    
  
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -98,7 +96,6 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
         xLabel.text = xString
         
         var max: Double = Double(screenTimeValues.max()!)
-        print("\(max)\n\n\n\n")
         let increment = (Double(max)/9.0)
         i = 9
         max = max.rounded()
