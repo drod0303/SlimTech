@@ -19,5 +19,6 @@ extension Data {
 
     @NSManaged public var screenTime: Double
     @NSManaged public var battery: Double
+    @NSManaged public var timeOfDay: Int32
 
 }

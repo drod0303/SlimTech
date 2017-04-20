@@ -110,7 +110,7 @@ class SettingsVC: UIViewController {
         saveButton.isHidden = true
         if(timeAlertPicker.isHidden == false){
             var hour = timeAlertPicker.value(forKeyPath: "hour") as? Int
-            var minute = timeAlertPicker.value(forKeyPath: "minute") as? Int
+            let minute = timeAlertPicker.value(forKeyPath: "minute") as? Int
             var minuteString = ""
             var hourString = ""
             

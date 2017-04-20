@@ -41,16 +41,18 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
     //end testing
     
     //test graph values
-    var screenTimeValues = [1.2,2.4,3.2,7.2,9.6,9.5,10.3,18.2,18.3,18.5,18.6,18.7,18.9,18.9,19.0,19.1,19.5,20.6,21.0,22.2,22.3,23.0,23.9,23.9]
-    var timeOfDay = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]
-    var battery = [99,98,97,96,95,94,93,92,91,90,89,88,87,86,85,84,83,82,81,80,79,78,77,76]
+    var screenTimeValues = [0.0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    var timeOfDay = [1,2,3,4,5,6,7,8,9,10,11,12,1,2,3,4,5,6,7,8,9,10,11,12]
+    var battery = [0.0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+ 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor.black
         switchButton.isHidden = true
         switchButton.isEnabled = false
+        generateTestData()
+        attemptFetch()
         
-
         //for background testing
         //this function monitor if the app moved to the background state
         NotificationCenter.default.addObserver(self, selector: #selector(detectBackground), name: Notification.Name.UIApplicationDidEnterBackground, object: nil)
@@ -89,7 +91,6 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
         //mathematical work around for the y and x axis labels
         var xString = " "
         var yString = ""
-        var step = 3
         var i = 0
         
         xString = "      3       6       9      12       3      6       9      12"
@@ -97,18 +98,21 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
         xLabel.text = xString
         
         var max: Double = Double(screenTimeValues.max()!)
-        var increment = (Double(max)/9.0).rounded()
+        print("\(max)\n\n\n\n")
+        let increment = (Double(max)/9.0)
         i = 9
-        max = 8 * increment
+        max = max.rounded()
         
         while(i>0){
             if(i==9){
-                yString += "\(Int(max))\n\n"
+                max = Double(round(10*max)/10)
+                yString += "\(max)\n\n"
                 max = max-increment
             } else if(i==1){
                 yString += "0"
             } else{
-                yString += "\(Int(max))\n\n"
+                max = Double(round(10*max)/10)
+                yString += "\(max)\n\n"
                 max = max - increment
             }
             
@@ -124,8 +128,6 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
     override func viewWillAppear(_ animated: Bool) {
       
         //adds labels to the graph at the moment of appearance on the screen
-        
-        let footer = UILabel(frame: CGRect(x: 0, y: barChart.frame.height + 3, width: barChart.frame.width, height: 20))
         
         
         
@@ -195,7 +197,7 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
         barChart.reloadData()
         lineChart.reloadData()
         
-        var timer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: Selector("showChart"), userInfo: nil, repeats: false)
+        var timer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(ViewController.showChart), userInfo: nil, repeats: false)
     }
     
     
@@ -247,14 +249,11 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
     //displays the data to the user for that time clicked
     func barChartView(_ barChartView: JBBarChartView!, didSelectBarAt index: UInt, touch touchPoint: CGPoint) {
       
-        var data = screenTimeValues[Int(index)]
-        var key = timeOfDay[Int(index)]
+        let data = screenTimeValues[Int(index)]
+        let key = timeOfDay[Int(index)]
         
-        var arrayKey = Int(index)
-        if(arrayKey > 11){
-            key = key - 12
-        }
-        var time = calculateTime(data: data)
+        let arrayKey = Int(index)
+        let time = calculateTime(data: Double(data))
         
         
         if(arrayKey < 11 || arrayKey == 23){
@@ -272,7 +271,7 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
     
     //this function allows for code action upon user diselection of an item
     func didDeselect(_ barChartView: JBBarChartView!) {
-    
+        
     }
     
     //if a bar is selected by the user then a black highlight will surround it
@@ -337,16 +336,21 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
         return true
     }
     
+    //creates the white highlight below the line graph curve
+    func lineChartView(_ lineChartView: JBLineChartView!, fillColorForLineAtLineIndex lineIndex: UInt) -> UIColor! {
+        return UIColor.white
+    }
+    
     //allows for update of the lower view upon selection in the line chart
     func lineChartView(_ lineChartView: JBLineChartView!, didSelectLineAt lineIndex: UInt, horizontalIndex: UInt) {
         if (lineIndex == 0){
-            var data = screenTimeValues[Int(horizontalIndex)]
-            var key = timeOfDay[Int(horizontalIndex)]
-            var arrayKey = Int(horizontalIndex)
+            let data = screenTimeValues[Int(horizontalIndex)]
+            let key = timeOfDay[Int(horizontalIndex)]
+            let arrayKey = Int(horizontalIndex)
             if(arrayKey > 11){
-                key = key - 12
+               // key = key - 12
             }
-            var time = calculateTime(data: data)
+            let time = calculateTime(data: Double(data))
             screenTimeRight.text = time
             batteryUseRight.text = "\(battery[Int(horizontalIndex)])%"
 
@@ -376,7 +380,7 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
     func calculateTime(data:Double) -> String{
         var time = ""
         var minutes = 0.0
-        var value = data
+        let value = data
         if(data != value.rounded()){
             minutes = data - value.rounded()
             minutes = 60*minutes
@@ -421,19 +425,19 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
     //count add function to output to the Counter label
     func addOne() {
         
-        var total = countNum
         countNum += 1
       
-        let results = "\(total)"
+        
         
         //showing results in the consel of what state the app is in
         switch UIApplication.shared.applicationState {
-        case .active:
-            print("App is foreground")
+        case .active: break
+            //print("App is foreground")
         //    counterLabel.text = results
         case .background:
             print("App is backgrounded. Next number = \(countNum)")
             print("Background time remaining = \(UIApplication.shared.backgroundTimeRemaining) seconds")
+            break
         case .inactive:
             print("App is inactive")
             break
@@ -461,25 +465,175 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
     func attemptFetch(){
         
         let fetchRequest: NSFetchRequest<Data> = Data.fetchRequest()
-       // let dateSort = NSSortDescriptor(key: "created", ascending: false)
-       // fetchRequest.sortDescriptors = [dateSort]
+        let timeSort = NSSortDescriptor(key: "timeOfDay", ascending: false)
+        fetchRequest.sortDescriptors = [timeSort]
         
         let controller = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
+        controller.delegate = self
+        self.controller = controller
         
         do{
             try controller.performFetch()
         } catch {
             let error = error as NSError
-            print("\(error)")
+            print("\(error) HELLO WORLD")
         }
+        
+        let resultsOfFetch = controller.fetchedObjects
+        let size = resultsOfFetch?.count
+        var step = 0
+        
+        while(step<size!){
+            battery[Int(resultsOfFetch![step].timeOfDay)] = resultsOfFetch![step].battery
+            screenTimeValues[Int(resultsOfFetch![step].timeOfDay)] = resultsOfFetch![step].screenTime
+            
+            step = step + 1
+        }
+        
         
         
     }
     
+   
     
     
+    func generateTestData(){
+        
+        var one: Data!
+        one = Data(context: context)
+        
+        one.screenTime = 0.5
+        one.battery = 99.0
+        one.timeOfDay = 0
+        
+        var two: Data!
+        two = Data(context: context)
+        
+        two.screenTime = 0.8
+        two.battery = 98.0
+        two.timeOfDay = 1
+        
+        var three: Data!
+        three = Data(context: context)
+        
+        three.screenTime = 1.5
+        three.battery = 96.0
+        three.timeOfDay = 2
+        
+        var four: Data!
+        four = Data(context: context)
+        
+        four.screenTime = 2.3
+        four.battery = 90.0
+        four.timeOfDay = 3
+        
+        var five: Data!
+        five = Data(context: context)
+        
+        five.screenTime = 2.4
+        five.battery = 87.0
+        five.timeOfDay = 4
+        
+        var six: Data!
+        six = Data(context: context)
+        
+        six.screenTime = 2.6
+        six.battery = 84.0
+        six.timeOfDay = 5
+        
+        var seven: Data!
+        seven = Data(context: context)
+        
+        seven.screenTime = 4.9
+        seven.battery = 83.0
+        seven.timeOfDay = 6
+        
+        var eight: Data!
+        eight = Data(context: context)
+        
+        eight.screenTime = 5.2
+        eight.battery = 82.0
+        eight.timeOfDay = 7
+        
+        var nine: Data!
+        nine = Data(context: context)
+        
+        nine.screenTime = 5.3
+        nine.battery = 75
+        nine.timeOfDay = 8
+        
+        var ten: Data!
+        ten = Data(context: context)
+        
+        ten.screenTime = 5.4
+        ten.battery = 75
+        ten.timeOfDay = 9
+        
+        var eleven: Data!
+        eleven = Data(context: context)
+        
+        eleven.screenTime = 5.5
+        eleven.battery = 70
+        eleven.timeOfDay = 10
+
+        var twelve: Data!
+        twelve = Data(context: context)
+        
+        twelve.screenTime = 5.6
+        twelve.battery = 70
+        twelve.timeOfDay = 11
+        
+        var onep: Data!
+        onep = Data(context: context)
+        
+        onep.screenTime = 7
+        onep.battery = 70
+        onep.timeOfDay = 12
+
+        var twop: Data!
+        twop = Data(context: context)
+        
+        twop.screenTime = 7.1
+        twop.battery = 68
+        twop.timeOfDay = 13
+
+        var threep: Data!
+        threep = Data(context: context)
+        
+        threep.screenTime = 7.1
+        threep.battery = 67
+        threep.timeOfDay = 14
+
+        var fourp: Data!
+        fourp = Data(context: context)
+        
+        fourp.screenTime = 7.1
+        fourp.battery = 60
+        fourp.timeOfDay = 15
+
+        var fivep: Data!
+        fivep = Data(context: context)
+        
+        fivep.screenTime = 8.3
+        fivep.battery = 55
+        fivep.timeOfDay = 16
+
+
+
+        
+        
+        ad.saveContext()
+    }
     
     
+    func configureArray(indexPath: NSIndexPath){
+        
+        let data = controller.object(at: indexPath as IndexPath)
+       
+        battery.insert(data.battery, at: Int(data.timeOfDay))
+        screenTimeValues.insert(data.screenTime, at: Int(data.timeOfDay))
+        timeOfDay.insert(Int(data.timeOfDay), at: Int(data.timeOfDay))
+    }
     
     
     

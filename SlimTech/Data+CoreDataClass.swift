@@ -10,12 +10,12 @@
 import Foundation
 import CoreData
 
-@objc(Data)
+//@objc(Data)
 public class Data: NSManagedObject {
     
     public override func awakeFromInsert() {
         super.awakeFromInsert()
-        
+    
         
     }
 
