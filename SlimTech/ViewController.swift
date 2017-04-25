@@ -45,11 +45,22 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
  
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        if !isAppAlreadyLaunchedOnce() {
+            //do nothing
+            
+        }
+        else{
+            //fetch data stored in core data
+            generateTestData()
+            attemptFetch()
+        }
+
+        
         view.backgroundColor = UIColor.black
         switchButton.isHidden = true
         switchButton.isEnabled = false
-        generateTestData()
-        attemptFetch()
+        
         
         //for background testing
         //this function monitor if the app moved to the background state
@@ -98,7 +109,7 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
         var max: Double = Double(screenTimeValues.max()!)
         let increment = (Double(max)/9.0)
         i = 9
-        max = max.rounded()
+        //max = max.rounded()
         
         while(i>0){
             if(i==9){
@@ -429,14 +440,12 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
         //showing results in the consel of what state the app is in
         switch UIApplication.shared.applicationState {
         case .active: break
-            //print("App is foreground")
-        //    counterLabel.text = results
         case .background:
-            print("App is backgrounded. Next number = \(countNum)")
-            print("Background time remaining = \(UIApplication.shared.backgroundTimeRemaining) seconds")
+           // print("App is backgrounded. Next number = \(countNum)")
+            //print("Background time remaining = \(UIApplication.shared.backgroundTimeRemaining) seconds")
             break
         case .inactive:
-            print("App is inactive")
+            //print("App is inactive")
             break
         }
     }
@@ -459,6 +468,8 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
     //////////////*****   CORE DATA IMPLEMENTATION     *****///////////////////
     
     
+    //allows for storing of data into SlimTech application
+    //allows for exiting of the app and later retrieval of said information
     func attemptFetch(){
         
         let fetchRequest: NSFetchRequest<Data> = Data.fetchRequest()
@@ -493,7 +504,7 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
     
    
     
-    
+    //test data to make sure that core data is being stored/retrieved correctly
     func generateTestData(){
         
         var one: Data!
@@ -573,7 +584,7 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
         eleven.battery = 70
         eleven.timeOfDay = 10
 
-        var twelve: Data!
+        /*var twelve: Data!
         twelve = Data(context: context)
         
         twelve.screenTime = 5.6
@@ -614,6 +625,7 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
         fivep.screenTime = 8.3
         fivep.battery = 55
         fivep.timeOfDay = 16
+    */
 
 
 
@@ -623,6 +635,7 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
     }
     
     
+    //fetches the core data and constructs it into the current arrays for the bar/line graph
     func configureArray(indexPath: NSIndexPath){
         
         let data = controller.object(at: indexPath as IndexPath)
@@ -631,6 +644,22 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
         screenTimeValues.insert(data.screenTime, at: Int(data.timeOfDay))
         timeOfDay.insert(Int(data.timeOfDay), at: Int(data.timeOfDay))
     }
+    
+    //detects first launching of app so see if core data needs to be fetched or not
+    func isAppAlreadyLaunchedOnce()->Bool{
+        let defaults = UserDefaults.standard
+        
+        if defaults.string(forKey: "isAppAlreadyLaunchedOnce") != nil{
+            //print("App already launched")
+            return true
+        }else{
+            defaults.set(true, forKey: "isAppAlreadyLaunchedOnce")
+            //print("App launched first time")
+            generateTestData()
+            return false
+        }
+    }
+
     
     
     
