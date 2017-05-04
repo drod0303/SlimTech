@@ -452,7 +452,7 @@ class ViewController: UIViewController, JBBarChartViewDelegate, JBBarChartViewDa
     
     //when app enter the background state
     func detectBackground() {
-        print("App is in background")
+        //print("App is in background")
         registerBackgroundTask()
         //Timer.scheduledTimer repeat a function at a certain interval for every 1 second
        Timer.scheduledTimer(timeInterval: 1, target: self,
